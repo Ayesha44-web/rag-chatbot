@@ -1,7 +1,0 @@
-streamlit
-langchain
-langchain-community
-langchain-groq
-huggingface_hub
-sentence-transformers
-torch
