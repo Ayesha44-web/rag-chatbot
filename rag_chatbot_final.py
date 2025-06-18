@@ -16,13 +16,11 @@ warnings.filterwarnings("ignore")
 logging.getLogger("transformers").setLevel(logging.ERROR)
 
 # ----------------------
-# API Key from Secrets
+# Groq API Key (Direct)
 # ----------------------
-if "GROQ_API_KEY" not in st.secrets:
-    st.error("🚫 GROQ_API_KEY is missing from Streamlit secrets!")
-    st.stop()
+os.environ["GROQ_API_KEY"] = "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"
 
-# Streamlit UI Setup
+# Streamlit App UI
 st.set_page_config(page_title="Ask Chatbot!", layout="centered")
 st.title("Ask Chatbot! 🤖")
 
@@ -32,15 +30,15 @@ PDF_PATH = "reflexion.pdf"
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# Display past messages
+# Show past messages
 for msg in st.session_state.messages:
     st.chat_message(msg["role"]).markdown(msg["content"])
 
-# Cache vectorstore creation
+# Cache the vectorstore from PDF
 @st.cache_resource
 def load_vectorstore():
     if not os.path.exists(PDF_PATH):
-        raise FileNotFoundError("🚫 PDF not found. Please ensure 'reflexion.pdf' is in the same folder.")
+        raise FileNotFoundError("🚫 PDF not found. Please ensure 'reflexion.pdf' is in the same folder as this script.")
     
     loader = PyPDFLoader(PDF_PATH)
     return VectorstoreIndexCreator(
@@ -59,7 +57,7 @@ if prompt:
         vectorstore = load_vectorstore()
 
         llm = ChatGroq(
-            groq_api_key=st.secrets["GROQ_API_KEY"],
+            groq_api_key=os.environ["GROQ_API_KEY"],
             model_name="llama3-8b-8192"
         )
 
@@ -78,3 +76,5 @@ if prompt:
 
     except Exception as e:
         st.error(f"🚫 Error: {str(e)}")
+
+
